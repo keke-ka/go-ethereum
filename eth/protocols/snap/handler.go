@@ -85,8 +85,6 @@ type Backend interface {
 func MakeProtocols(backend Backend) []p2p.Protocol {
 	protocols := make([]p2p.Protocol, len(ProtocolVersions))
 	for i, version := range ProtocolVersions {
-		version := version // Closure
-
 		protocols[i] = p2p.Protocol{
 			Name:    ProtocolName,
 			Version: version,
@@ -456,7 +454,7 @@ func ServiceGetByteCodesQuery(chain *core.BlockChain, req *GetByteCodesPacket) [
 			// Peers should not request the empty code, but if they do, at
 			// least sent them back a correct response without db lookups
 			codes = append(codes, []byte{})
-		} else if blob, err := chain.ContractCodeWithPrefix(hash); err == nil {
+		} else if blob := chain.ContractCodeWithPrefix(hash); len(blob) > 0 {
 			codes = append(codes, blob)
 			bytes += uint64(len(blob))
 		}
